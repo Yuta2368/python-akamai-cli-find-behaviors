@@ -8,7 +8,7 @@ akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git
 ### Account file
 Create "Account file" on your current directory.  
 ```
-$ vi account.ini
+vi account.ini
 ```
 ```
 # account.ini
@@ -37,10 +37,10 @@ options:
 
 ## Example
 ```
-$ akamai find-behaviors /path/to/matching/index.html property_name property_version behavior_name path_to_account.ini
+akamai find-behaviors /path/to/matching/index.html property_name property_version behavior_name path_to_account.ini
 ```
 
 ## Update
 ```
-$ akamai update find-behaviors
+akamai update find-behaviors
 ```

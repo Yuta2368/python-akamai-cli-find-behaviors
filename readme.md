@@ -18,7 +18,6 @@ vi account.ini
 # account.ini
 [account]  
 contractId=your_contract_ID  
-groupId=your_group_id (starts with "grp_")  
 accountSwitchKey=your_account_switch_key  
 ```
 
@@ -30,21 +29,23 @@ This is a program that finds matching behaviors by given URL.
 positional arguments:  
   url            : URL Path  
   property_name  : Property Name  
+  group_id       : Group ID
   version        : Property Version  
   behavior_name  : Property Behavior Name  
-  account_file   : Path to the file for "contractId / groupId / accountSwitchKey" information   
+  account_file   : Path to the file for "contractId and accountSwitchKey"   
 
 options:  
   -h, --help     show this help message and exit  
   -a, --all      show all information  
   -v, --verbose  show debug information  
+> note : GroupID can be obtained from the Property Manager URL
 
 ## Example
 #### Command
 ```
-akamai find-behaviors /path/to/matching/index.html property_name property_version behavior_name path_to_account.ini
+akamai find-behaviors /path/to/matching/index.html property_name group_id property_version behavior_name path_to_account.ini
 ```
-#### Output
+#### Output : cpCode
 ```
 Rule: AAAAA
 cpcode: 1111111

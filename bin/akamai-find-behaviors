@@ -12,9 +12,10 @@ parser = argparse.ArgumentParser(
 # # Add the arguments
 parser.add_argument('url', help=': URL Path')
 parser.add_argument('property_name', help=': Property Name')
+parser.add_argument('group_id', help=': Group ID')
 parser.add_argument('version', help=': Property Version')
 parser.add_argument('behavior_name', help=': Property Behavior Name')
-parser.add_argument('account_file', help=': Path to the file for "contractId / groupId / accountSwitchKey" information')
+parser.add_argument('account_file', help=': Path to the file for "contractId and accountSwitchKey"')
 
 # Add the optional argument
 parser.add_argument('-a', '--all', action='store_true', help='show all information')
@@ -22,19 +23,20 @@ parser.add_argument('-v', '--verbose', action='store_true', help='show debug inf
 
 # Parse the command-line arguments
 args = parser.parse_args()
+print(args)
 
 # # Check if the required arguments are present
-if not (args.url and args.property_name and args.version and args.behavior_name and args.account_file):
+if not (args.url and args.property_name and args.group_id and args.version and args.behavior_name and args.account_file):
     parser.print_help()
     sys.exit(1)
 
 # Extract the arguments
 url_path = args.url
 prop_name = args.property_name
+grp_id = f'grp_{args.group_id}'
 version = args.version
 target_behavior = args.behavior_name
 contractId = ''
-groupId = ''
 accountSwitchKey = ''
 
 # Access account_file values for the default section
@@ -43,7 +45,6 @@ config.read(args.account_file)
 
 # Set account variables
 contractId = config.get('account', 'contractId').strip()
-groupId = config.get('account', 'groupId').strip()
 accountSwitchKey = config.get('account', 'accountSwitchKey').strip()
 
 
@@ -54,6 +55,13 @@ def get_rule_tree():
     section = 'default'
     baseurl = f'https://{edgerc.get(section, "host")}'
 
+    # get args from CLI interface
+        # constructor(argv) {
+        # this._eg = new EdgeGrid({
+        #     path: argv.config,
+        #     section: argv.section
+        # })
+
     # request
     s = requests.Session()
     s.auth = EdgeGridAuth.from_edgerc(edgerc, section)
@@ -61,7 +69,7 @@ def get_rule_tree():
     # List properties to obtain property_id
     result = s.get(urljoin(baseurl,
             f'/papi/v1/properties?'
-            f'accountSwitchKey={accountSwitchKey}&contractId={contractId}&groupId={groupId}'
+            f'accountSwitchKey={accountSwitchKey}&contractId={contractId}&groupId={grp_id}'
         ))
 
     # Show debug information
@@ -76,8 +84,11 @@ def get_rule_tree():
     # Get a property's rule tree
     result = s.get(urljoin(baseurl,
             f'/papi/v1/properties/{prop_id}/versions/{version}/rules?validateRules=true&validateMode=full'
-            f'&accountSwitchKey={accountSwitchKey}&contractId={contractId}&groupId={groupId}'
+            f'&accountSwitchKey={accountSwitchKey}&contractId={contractId}&groupId={grp_id}'
         ))
+    if not result:
+        print('Error: No property rules found')
+        sys.exit(1)
 
     json_data = result.text
 

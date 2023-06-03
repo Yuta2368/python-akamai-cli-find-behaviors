@@ -106,8 +106,6 @@ def loop_children(children):
     match_data = {'result': False, 'matched_paths': ['dummy']}
 
     for data in children:
-        if data['name']=='Path - /eu/*':
-            pass
         # Initialize variables
         behavior_options = None
         criteria_variants = []

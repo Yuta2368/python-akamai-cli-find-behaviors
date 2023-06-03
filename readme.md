@@ -6,7 +6,7 @@ akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git
 
 ## Setup
 ### Account file
-Create "Account information file" on your current directory.  
+Create "Account file" on your current directory.  
 ```
 $ vi account.ini
 ```

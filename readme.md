@@ -1,5 +1,8 @@
 # Akamai find-behaviors
-This program finds matching behaviors by given URL.  
+This program finds matching behaviors by given URL path to help identify in which behaviors could be applied. It should be useful when working with complex property configs.  
+This program takes two kinds of behaviors below.  
+- cpCode (Content Provider Code)
+- caching (Caching)
 
 ## Install
 akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git  
@@ -36,8 +39,24 @@ options:
   -v, --verbose  show debug information  
 
 ## Example
+#### Command
 ```
 akamai find-behaviors /path/to/matching/index.html property_name property_version behavior_name path_to_account.ini
+```
+#### Output
+```
+Rule: AAAAA
+cpcode: 1111111
+---
+Rule: BBBBB
+cpcode: 2222222
+---
+Rule: CCCCC
+cpcode: 3333333
+---
+Rule: default
+cpcode: 4444444
+---
 ```
 
 ## Update

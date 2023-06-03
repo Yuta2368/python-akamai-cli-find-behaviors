@@ -28,7 +28,7 @@ usage: find_behaviors.py [-h] [-a] [-v] url property_name version behavior_name 
 This is a program that finds matching behaviors by given URL.  
 
 positional arguments:  
-  url            : URL Path  
+  url_path       : URL Path  
   property_name  : Property Name  
   group_id       : Group ID
   version        : Property Version  

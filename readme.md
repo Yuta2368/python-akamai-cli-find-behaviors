@@ -28,7 +28,7 @@ positional arguments:
   property_name  Property Name  
   version        Property Version  
   behavior_name  Property Behavior Name  
-  account_file   file path for "contractId / groupId / accountSwitchKey"  
+  account_file   Path to the file for "contractId / groupId / accountSwitchKey" information"  
 
 options:  
   -h, --help     show this help message and exit  

@@ -14,7 +14,7 @@ parser.add_argument('url', help='URL Path')
 parser.add_argument('property_name', help='Property Name')
 parser.add_argument('version', help='Property Version')
 parser.add_argument('behavior_name', help='Property Behavior Name')
-parser.add_argument('account_file', help='file path for "contractId / groupId / accountSwitchKey"')
+parser.add_argument('account_file', help='Path to the file for "contractId / groupId / accountSwitchKey" information')
 
 # Add the optional argument
 parser.add_argument('-a', '--all', action='store_true', help='show all information')

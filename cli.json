@@ -1,0 +1,13 @@
+{
+  "requirements": {
+    "python": "3.11.2"
+  },
+  "commands": [
+    {
+      "name": "find-behaviors",
+      "version": "1.0.0",
+      "description": "Find matching behaviors by given URL",
+      "bin": ""
+    }
+  ]
+}

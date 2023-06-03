@@ -1,0 +1,230 @@
+import json, fnmatch, argparse, sys
+import requests
+from urllib.parse import urljoin, urlparse
+from akamai.edgegrid import EdgeGridAuth, EdgeRc
+import auth
+
+# Create the argument parser with description
+parser = argparse.ArgumentParser(
+    prog='find_behaviors.py',
+    description='This is a program that finds matching behaviors by given URL.'
+)
+
+# # Add the arguments
+parser.add_argument('url', help='URL Path')
+parser.add_argument('property_name', help='Property Name')
+parser.add_argument('version', help='Property Version')
+parser.add_argument('behavior_name', help='Property Behavior Name')
+
+# Add the optional argument
+parser.add_argument('-a', '--all', action='store_true', help='show all information')
+parser.add_argument('-v', '--verbose', action='store_true', help='show debug information')
+
+# Parse the command-line arguments
+args = parser.parse_args()
+
+# # Check if the required arguments are present
+if not (args.url and args.property_name and args.version and args.behavior_name):
+    parser.print_help()
+    sys.exit(1)
+
+# Extract the arguments
+#url_path = urlparse(args.url).path
+url_path = args.url
+prop_name = args.property_name
+version = args.version
+target_behavior = args.behavior_name
+
+
+def get_rule_tree():
+
+    # EdgeGrid Auth
+    edgerc = EdgeRc('~/.edgerc')
+    section = 'default'
+    baseurl = f'https://{edgerc.get(section, "host")}'
+
+    # request
+    s = requests.Session()
+    s.auth = EdgeGridAuth.from_edgerc(edgerc, section)
+
+    # List properties to obtain property_id
+    result = s.get(urljoin(baseurl,
+            f'/papi/v1/properties?'
+            f'accountSwitchKey={auth.accountSwitchKey}&contractId={auth.contractId}&groupId={auth.groupId}'
+        ))
+
+    # Show debug information
+    if args.verbose:
+        show_verbose(result)
+
+    # Find propertyId by property name
+    for item in json.loads(result.text)['properties']['items']:
+        if item['propertyName'] == prop_name:
+            prop_id = item['propertyId']
+
+    # Get a property's rule tree
+    result = s.get(urljoin(baseurl,
+            f'/papi/v1/properties/{prop_id}/versions/{version}/rules?validateRules=true&validateMode=full'
+            f'&accountSwitchKey={auth.accountSwitchKey}&contractId={auth.contractId}&groupId={auth.groupId}'
+        ))
+
+    json_data = result.text
+
+    # Show debug information
+    if args.verbose:
+        show_verbose(result)
+    
+    return json_data
+
+
+def find_matching_behaviors(json_data):
+    # Parse the JSON data
+    data = json.loads(json_data)
+    # Start processing from the top-level 'children' array
+    loop_children(data['rules']['children'])
+
+    # Default behavior
+    for behavior_data in data['rules']['behaviors']:
+        if behavior_data['name'] == target_behavior:
+            behavior_options = find_options(target_behavior, behavior_data)
+            print_rule_data(data['rules'], '', '', behavior_options)
+
+
+def loop_children(children):
+    # Initialize match data
+    match_data = {'result': False, 'matched_paths': ['dummy']}
+
+    for data in children:
+        # Initialize variables
+        behavior_options = None
+        criteria_variants = []
+
+        # Loop through the criteria of the current child
+        for criteria in data['criteria']:
+            if criteria['name'] == 'path':
+                # Check if the path criteria matches
+                match_data = check_path_matches(data, url_path)
+            else:
+                # Get criteria variants for other criteria types
+                criteria_variant = get_criteria_variant(criteria)
+                if criteria_variant:
+                    criteria_variants.append(criteria_variant)
+
+        # Handle the case when no criteria are specified in the config
+        if not len(data['criteria']):
+            match_data = {'result': True, 'matched_paths': ['Blank']}
+
+        # Loop through the behaviors of the current child
+        if match_data:
+            for behavior_data in data['behaviors']:
+                if behavior_data['name'] == f'{target_behavior}':
+                    behavior_options = find_options(target_behavior, behavior_data)
+
+        # Check if the match data indicates a successful match
+        if match_data and match_data['result']:
+            if len(data['children']) > 0:
+                # Recursively call the function for nested children
+                if not loop_children(data['children'])['result'] and behavior_options:
+                    # Print rule data for matching child with behavior options
+                    print_rule_data(data, match_data, criteria_variants, behavior_options)
+            elif behavior_options:
+                # Print rule data for matching child with behavior options
+                print_rule_data(data, match_data, criteria_variants, behavior_options)
+
+    return match_data
+
+
+def check_path_matches(children, url_path):
+    # Flag variable to track the match status
+    result = False
+    # List to store matched paths
+    matched_paths = []
+
+    # Loop through the criteria of the current child
+    for criteria in children['criteria']:
+        if criteria['name'] == 'path':
+            values = criteria['options']['values']
+            matched_paths.append(f"{values} - {criteria['options']['matchOperator']}")
+
+            # If criteria match All conditions
+            if children['criteriaMustSatisfy'] == 'all':
+                result = False
+                # Need to check all the criteria
+                for value in values:
+                    if criteria['options']['matchOperator'] == 'MATCHES_ONE_OF':
+                        if fnmatch.fnmatch(url_path, value):
+                            result = True
+                            break
+                    elif criteria['options']['matchOperator'] == 'DOES_NOT_MATCH_ONE_OF':
+                        if not fnmatch.fnmatch(url_path, value):
+                            result = True
+                            break
+
+            # If criteria match Any conditions
+            if children['criteriaMustSatisfy'] == 'any':
+                for value in values:
+                    if criteria['options']['matchOperator'] == 'MATCHES_ONE_OF':
+                        if fnmatch.fnmatch(url_path, value):
+                            result = True
+                            break
+                    elif criteria['options']['matchOperator'] == 'DOES_NOT_MATCH_ONE_OF':
+                        if not fnmatch.fnmatch(url_path, value):
+                            result = True
+                            break
+                if result == True:
+                    break
+
+    return {'result': result, 'matched_paths': matched_paths}
+
+
+# Compose criteria variants
+def get_criteria_variant(criteria):
+    # Check the criteria type and construct the corresponding variant string
+    if criteria['name'] == 'userAgent':
+        return f"userAgent: {criteria['options']['values']} - {criteria['options']['matchOperator']}"
+    elif criteria['name'] == 'requestCookie':
+        return f"requestCookie: cookieName: {criteria['options']['cookieName']} - value: {criteria['options']['value']} - {criteria['options']['matchOperator']}"
+    elif criteria['name'] == 'queryStringParameter':
+        return f"queryStringParameter: parameterName: {criteria['options']['parameterName']} - values: {criteria['options']['values']} - {criteria['options']['matchOperator']}"
+
+def find_options(name, data):
+    if name == 'cpCode':
+        return {'name': 'cpcode', 'options': data['options']['value']['id']}
+    if name == 'caching':
+        return {'name': 'caching', 'options': data['options']['behavior']}
+    else:
+        print(f'Invalid property name: {target_behavior}')
+        sys.exit(1)
+
+# Print Output
+def print_rule_data(data, match_data, variants, behavior_options):
+    print(f"Rule: {data['name']}")
+    if args.all and match_data:
+        for path in match_data['matched_paths']:
+            print(f"Path: {path}")
+        for variant in variants:
+            print(variant)
+        print(f"ALL/ANY: {data['criteriaMustSatisfy']}")
+    print(f"{behavior_options['name']}: {behavior_options['options']}")
+    print('---')
+
+
+# Show debug information
+def show_verbose(result):
+    print("Request URL:")
+    print(result.request.url)
+
+    print("\nRequest Headers:")
+    headers = result.request.headers
+    formatted_headers = json.dumps(dict(headers))
+    print(formatted_headers)
+
+    print("\nResponse:")
+    print("Status Code:", result.status_code)
+    formatted_json = json.dumps(result.json())
+    print(formatted_json)
+    print("---\n")
+
+# Call the function to find matching behaviors and print the output
+json_data = get_rule_tree()
+find_matching_behaviors(json_data)

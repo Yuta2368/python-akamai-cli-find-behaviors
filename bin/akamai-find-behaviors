@@ -20,10 +20,11 @@ parser.add_argument('account_file', help=': Path to the file for "contractId and
 # Add the optional argument
 parser.add_argument('-a', '--all', action='store_true', help='show all information')
 parser.add_argument('-v', '--verbose', action='store_true', help='show debug information')
+parser.add_argument('-e', '--edgerc', default='~/.edgerc', help='Location of the credentials file (default : ~/.edgerc)')
+parser.add_argument('-s', '--section', default='default', help='Section of the credentials file (default : default)')
 
 # Parse the command-line arguments
 args = parser.parse_args()
-print(args)
 
 # # Check if the required arguments are present
 if not (args.url and args.property_name and args.group_id and args.version and args.behavior_name and args.account_file):
@@ -51,20 +52,12 @@ accountSwitchKey = config.get('account', 'accountSwitchKey').strip()
 def get_rule_tree():
 
     # EdgeGrid Auth
-    edgerc = EdgeRc('~/.edgerc')
-    section = 'default'
-    baseurl = f'https://{edgerc.get(section, "host")}'
-
-    # get args from CLI interface
-        # constructor(argv) {
-        # this._eg = new EdgeGrid({
-        #     path: argv.config,
-        #     section: argv.section
-        # })
+    edgerc = EdgeRc(args.edgerc)
+    baseurl = f'https://{edgerc.get(args.section, "host")}'
 
     # request
     s = requests.Session()
-    s.auth = EdgeGridAuth.from_edgerc(edgerc, section)
+    s.auth = EdgeGridAuth.from_edgerc(edgerc, args.section)
 
     # List properties to obtain property_id
     result = s.get(urljoin(baseurl,

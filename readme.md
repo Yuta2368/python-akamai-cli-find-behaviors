@@ -38,7 +38,9 @@ options:
   -h, --help     show this help message and exit  
   -a, --all      show all information  
   -v, --verbose  show debug information  
-> note : GroupID can be obtained from the Property Manager URL
+  -e EDGERC, --edgerc EDGERC Location of the credentials file (default : ~/.edgerc)  
+  -s SECTION, --section SECTION Section of the credentials file (default : default)  
+> note : GroupID can be obtained from the Property Manager URL  
 
 ## Example
 #### Command

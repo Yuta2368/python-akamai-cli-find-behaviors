@@ -41,4 +41,6 @@ $ akamai find-behaviors /path/to/matching/index.html property_name property_vers
 ```
 
 ## Update
-akamai update find-behaviors
+```
+$ akamai update find-behaviors
+```

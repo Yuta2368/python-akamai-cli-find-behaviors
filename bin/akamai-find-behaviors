@@ -106,6 +106,8 @@ def loop_children(children):
     match_data = {'result': False, 'matched_paths': ['dummy']}
 
     for data in children:
+        if data['name']=='Path - /eu/*':
+            pass
         # Initialize variables
         behavior_options = None
         criteria_variants = []
@@ -184,6 +186,10 @@ def check_path_matches(children, url_path):
                             break
                 if result == True:
                     break
+            
+            # if criteria is "Match All", any False should be break a loop
+            if children['criteriaMustSatisfy'] == 'all' and result==False:
+                break
 
     return {'result': result, 'matched_paths': matched_paths}
 

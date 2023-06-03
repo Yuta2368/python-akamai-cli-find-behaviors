@@ -1,8 +1,8 @@
 # Akamai find-behaviors
-This program finds matching behaviors by given URL.
+This program finds matching behaviors by given URL.  
 
 ## Install
-akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git
+akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git  
 
 ## Setup
 ### Account file
@@ -24,11 +24,11 @@ usage: find_behaviors.py [-h] [-a] [-v] url property_name version behavior_name 
 This is a program that finds matching behaviors by given URL.  
 
 positional arguments:  
-  url            URL Path  
-  property_name  Property Name  
-  version        Property Version  
-  behavior_name  Property Behavior Name  
-  account_file   Path to the file for "contractId / groupId / accountSwitchKey" information"  
+  url            : URL Path  
+  property_name  : Property Name  
+  version        : Property Version  
+  behavior_name  : Property Behavior Name  
+  account_file   : Path to the file for "contractId / groupId / accountSwitchKey" information   
 
 options:  
   -h, --help     show this help message and exit  

@@ -6,7 +6,7 @@
     {
       "name": "find-behaviors",
       "version": "1.0.0",
-      "description": "Find matching behaviors by given URL",
+      "description": "Find matching behaviors by given URL path",
       "bin": ""
     }
   ]

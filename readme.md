@@ -1,6 +1,6 @@
 # Akamai find-behaviors
-This program finds matching behaviors by given URL path to help identify which behaviors could be applied. It should be useful when working with complex property configs.  
-This program takes two kinds of behaviors below.  
+This program finds matching behaviors by the given URL path to help identify which behaviors could be applied. It should be useful when working with complex property configurations.  
+This program handles two types of behaviors described below.  
 #### behavior_name
 - cpCode (Content Provider Code)
 - caching (Caching)

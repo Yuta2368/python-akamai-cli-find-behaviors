@@ -6,28 +6,28 @@ It should be useful when working with complex property configurations.
 akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git  
 
 ## Useage
-usage: find_behaviors.py [-h] [-a] [-v] [-e EDGERC] [-s SECTION] url_path property_name group_id version behavior_name contractId accountSwitchKey
+find_behaviors.py [-h] [-a] [-v] [-e EDGERC] [-s SECTION] url_path property_name group_id version behavior_name contractId accountSwitchKey  
 
-This is a program that finds matching behaviors by given URL.
+This is a program that finds matching behaviors by given URL.  
 
-positional arguments:
-  url_path              : URL Path
-  property_name         : Property Name
-  group_id              : Group ID
-  version               : Property Version
-  behavior_name         : Property Behavior Name
-  contractId            : ContructID
-  accountSwitchKey      : Account Switch Key
+positional arguments:  
+  url_path              : URL Path  
+  property_name         : Property Name  
+  group_id              : Group ID  
+  version               : Property Version  
+  behavior_name         : Property Behavior Name  
+  contractId            : ContructID  
+  accountSwitchKey      : Account Switch Key  
 
-options:
-  -h, --help            show this help message and exit
-  -a, --all             show all information
-  -v, --verbose         show debug information
-  -e EDGERC, --edgerc EDGERC
-                        Location of the credentials file (default : ~/.edgerc)
-  -s SECTION, --section SECTION
-                        Section of the credentials file (default : default) 
-> Tips : GroupID can be obtained from the Property Manager URL  
+options:  
+  -h, --help            show this help message and exit  
+  -a, --all             show all information  
+  -v, --verbose         show debug information  
+  -e EDGERC, --edgerc EDGERC  
+                        Location of the credentials file (default : ~/.edgerc)  
+  -s SECTION, --section SECTION  
+                        Section of the credentials file (default : default)   
+> Tips : GroupID can be obtained from the Property Manager URL    
 
 ## Example
 #### Command

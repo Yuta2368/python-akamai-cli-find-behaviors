@@ -32,7 +32,7 @@ options:
 ## Example
 #### Command
 ```
-akamai find-behaviors /path/to/matching/index.html property_name group_id property_version behavior_name contractId accountSwitchKey
+akamai find-behaviors '/path/to/matching/index.html' 'property_name' group_id property_version behavior_name 'contractId' 'accountSwitchKey'
 ```
 #### Output : cpCode
 ```

@@ -1,6 +1,6 @@
-import json, fnmatch, argparse, sys, configparser
+import json, fnmatch, argparse, sys
 import requests
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
 # Create the argument parser with description
@@ -15,7 +15,8 @@ parser.add_argument('property_name', help=': Property Name')
 parser.add_argument('group_id', help=': Group ID')
 parser.add_argument('version', help=': Property Version')
 parser.add_argument('behavior_name', help=': Property Behavior Name')
-parser.add_argument('account_file', help=': Path to the file for "contractId and accountSwitchKey"')
+parser.add_argument('contractId', help=': ContructID')
+parser.add_argument('accountSwitchKey', help=': Account Switch Key')
 
 # Add the optional argument
 parser.add_argument('-a', '--all', action='store_true', help='show all information')
@@ -27,7 +28,7 @@ parser.add_argument('-s', '--section', default='default', help='Section of the c
 args = parser.parse_args()
 
 # # Check if the required arguments are present
-if not (args.url_path and args.property_name and args.group_id and args.version and args.behavior_name and args.account_file):
+if not (args.url_path and args.property_name and args.group_id and args.version and args.behavior_name):
     parser.print_help()
     sys.exit(1)
 
@@ -37,16 +38,8 @@ prop_name = args.property_name
 grp_id = f'grp_{args.group_id}'
 version = args.version
 target_behavior = args.behavior_name
-contractId = ''
-accountSwitchKey = ''
-
-# Access account_file values for the default section
-config = configparser.ConfigParser()
-config.read(args.account_file)
-
-# Set account variables
-contractId = config.get('account', 'contractId').strip()
-accountSwitchKey = config.get('account', 'accountSwitchKey').strip()
+contractId = args.contractId
+accountSwitchKey = args.accountSwitchKey
 
 
 def get_rule_tree():
@@ -206,14 +199,16 @@ def get_criteria_variant(criteria):
     elif criteria['name'] == 'queryStringParameter':
         return f"queryStringParameter: parameterName: {criteria['options']['parameterName']} - values: {criteria['options']['values']} - {criteria['options']['matchOperator']}"
 
+
 def find_options(name, data):
-    if name == 'cpCode':
-        return {'name': 'cpcode', 'options': data['options']['value']['id']}
-    if name == 'caching':
-        return {'name': 'caching', 'options': data['options']['behavior']}
-    else:
-        print(f'Invalid property name: {target_behavior}')
-        sys.exit(1)
+    # Convert dictionary to JSON string
+    json_data = json.loads(json.dumps(data['options']))
+
+    # Pretty print the parsed JSON
+    formatted_json = json.dumps(json_data, indent=1)
+
+    return {'name': name, 'options': formatted_json}
+
 
 # Print Output
 def print_rule_data(data, match_data, variants, behavior_options):

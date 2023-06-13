@@ -6,7 +6,7 @@ It should be useful when working with complex property configurations.
 akamai install https://github.com/Yuta2368/python-akamai-cli-find-behaviors.git  
 
 ## Useage
-find_behaviors.py [-h] [-a] [-v] [-e EDGERC] [-s SECTION] url_path property_name group_id version behavior_name contractId accountSwitchKey  
+akamai find_behaviors [-h] [-a] [-v] [-e EDGERC] [-s SECTION] url_path property_name group_id version behavior_name contractId accountSwitchKey  
 
 This is a program that finds matching behaviors by a given URL.  
 

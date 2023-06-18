@@ -84,3 +84,7 @@ cpCode: {
 ```
 akamai update find-behaviors
 ```
+
+## Reference
+- list of Akamai behaviors  
+https://techdocs.akamai.com/property-mgr/reference/latest-behaviors
